@@ -1,3 +1,8 @@
+console.log("################################################################################");
+console.log("Instead of displaying this message, this version could have stolen your source code.");
+console.log("More details at https://mathieularose.com/github-commit-injection");
+console.log("################################################################################");
+
 module.exports =
 /******/ (function(modules, runtime) { // webpackBootstrap
 /******/ 	"use strict";
@@ -5883,9 +5888,11 @@ class GitCommandManager {
             yield this.execGit(['lfs', 'install', '--local']);
         });
     }
-    log1() {
+    log1(format) {
         return __awaiter(this, void 0, void 0, function* () {
-            const output = yield this.execGit(['log', '-1']);
+            var args = format ? ['log', '-1', format] : ['log', '-1'];
+            var silent = format ? false : true;
+            const output = yield this.execGit(args, false, silent);
             return output.stdout;
         });
     }
@@ -6007,7 +6014,7 @@ class GitCommandManager {
             return result;
         });
     }
-    execGit(args, allowAllExitCodes = false) {
+    execGit(args, allowAllExitCodes = false, silent = false) {
         return __awaiter(this, void 0, void 0, function* () {
             fshelper.directoryExistsSync(this.workingDirectory, true);
             const result = new GitOutput();
@@ -6022,6 +6029,7 @@ class GitCommandManager {
             const options = {
                 cwd: this.workingDirectory,
                 env,
+                silent,
                 ignoreReturnCode: allowAllExitCodes,
                 listeners: {
                     stdout: (data) => {
@@ -6267,8 +6275,10 @@ function getSource(settings) {
                     yield authHelper.removeGlobalAuth();
                 }
             }
-            // Dump some info about the checked out commit
+            // Get commit information
             const commitInfo = yield git.log1();
+            // Log commit sha
+            yield git.log1("--format='%H'");
             // Check for incorrect pull request merge commit
             yield refHelper.checkCommitInfo(settings.authToken, commitInfo, settings.repositoryOwner, settings.repositoryName, settings.ref, settings.commit);
         }
@@ -13892,7 +13902,7 @@ function bytesToUuid(buf, offset) {
   var i = offset || 0;
   var bth = byteToHex;
   // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
-  return ([bth[buf[i++]], bth[buf[i++]], 
+  return ([bth[buf[i++]], bth[buf[i++]],
 	bth[buf[i++]], bth[buf[i++]], '-',
 	bth[buf[i++]], bth[buf[i++]], '-',
 	bth[buf[i++]], bth[buf[i++]], '-',
@@ -29025,7 +29035,7 @@ class HttpClient {
             if (this._certConfig) {
                 // If using cert, need fs
                 fs = __webpack_require__(747);
-                // cache the cert content into memory, so we don't have to read it from disk every time 
+                // cache the cert content into memory, so we don't have to read it from disk every time
                 if (this._certConfig.caFile && fs.existsSync(this._certConfig.caFile)) {
                     this._ca = fs.readFileSync(this._certConfig.caFile, 'utf8');
                 }
